@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "VivoPing - Dead Man's Switch & Notfallvorsorge",
+  "short_name": "VivoPing",
+  "description": "Intelligenter Dead Man's Switch, Notfallvorsorge & Digitaler Tresor. Schützt Alleinlebende und alarmiert Angehörige bei Inaktivität.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FAFAFC",
+  "theme_color": "#E63946",
+  "icons": [
+    {
+      "src": "/vivoping-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/vivoping-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

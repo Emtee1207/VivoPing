@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and check-in status",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "lastCheckIn": { "type": "string", "format": "date-time" },
+        "checkInFrequency": { "type": "string", "enum": ["weekly"] },
+        "status": { "type": "string", "enum": ["active", "pending_alert", "alert_triggered"] },
+        "alertTriggeredAt": { "type": "string", "format": "date-time" },
+        "language": { "type": "string" },
+        "consentPreferences": { "type": "string" }
+      },
+      "required": ["uid", "email", "status"]
+    },
+    "EmergencyContact": {
+      "title": "Emergency Contact",
+      "description": "Contact information for emergency notifications",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "relation": { "type": "string" }
+      },
+      "required": ["name", "email"]
+    },
+    "VaultItem": {
+      "title": "Vault Item",
+      "description": "Securely stored credentials or information",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "category": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content"]
+    },
+    "Location": {
+      "title": "Location",
+      "description": "Real-time location data",
+      "type": "object",
+      "properties": {
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["latitude", "longitude", "timestamp"]
+    },
+    "StatusHistoryItem": {
+      "title": "Status History Item",
+      "description": "Timestamped log of status changes for auditing and alerts tracking",
+      "type": "object",
+      "properties": {
+        "fromStatus": { "type": "string" },
+        "toStatus": { "type": "string" },
+        "reason": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "note": { "type": "string" }
+      },
+      "required": ["toStatus", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile and status"
+    },
+    "/users/{userId}/contacts/{contactId}": {
+      "schema": "EmergencyContact",
+      "description": "Emergency contacts for the user"
+    },
+    "/users/{userId}/vault/{itemId}": {
+      "schema": "VaultItem",
+      "description": "Secure information for emergency access"
+    },
+    "/users/{userId}/locations/current": {
+      "schema": "Location",
+      "description": "Current location of the user"
+    },
+    "/users/{userId}/statusHistory/{historyId}": {
+      "schema": "StatusHistoryItem",
+      "description": "Timestamped history of status transitions"
+    }
+  }
+}

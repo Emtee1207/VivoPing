@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VivoPing - Dead Man's Switch & Notfallvorsorge</title>
+    <meta name="description" content="VivoPing - Intelligentes Dead Man's Switch System, Notfallvorsorge & Digitaler Tresor. Überwacht Ihr Wohlbefinden und alarmiert Ihre Vertrauenspersonen im Notfall." />
+    
+    <!-- OpenGraph / Social Sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="VivoPing - Dead Man's Switch & Notfallvorsorge" />
+    <meta property="og:description" content="Sichern Sie Ihre digitale Hinterlassenschaft und stellen Sie sicher, dass Ihre Liebsten im Notfall sofort informiert werden." />
+    <meta property="og:image" content="/vivoping-icon-512.png" />
+
+    <!-- Favicon & Touch Icons -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/vivoping-icon-192.png" />
+
+    <!-- Web App Manifest & Mobile PWA Configuration -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#E63946" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="VivoPing" />
+
+    <!-- Google Fonts: Montserrat (for VivoPing Logo & Headings) and Inter (for App-UI) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#FAFAFC] text-[#2B2D42] antialiased selection:bg-[#E63946] selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Register Service Worker for PWA & Offline reliability
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(
+            (reg) => {
+              console.log('VivoPing ServiceWorker registered with scope:', reg.scope);
+            },
+            (err) => {
+              console.warn('VivoPing ServiceWorker registration failed:', err);
+            }
+          );
+        });
+      }
+    </script>
+  </body>
+</html>

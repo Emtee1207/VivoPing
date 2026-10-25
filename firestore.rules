@@ -1,0 +1,132 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: users
+// Document ID: {userId}
+// Fields:
+//   - uid: string (required)
+//   - email: string (required)
+//   - displayName: string
+//   - lastCheckIn: timestamp
+//   - checkInFrequency: string (enum: ['weekly'])
+//   - status: string (enum: ['active', 'pending_alert', 'alert_triggered'])
+//   - alertTriggeredAt: timestamp
+//
+// Collection: users/{userId}/contacts
+// Document ID: {contactId}
+// Fields:
+//   - name: string (required)
+//   - email: string (required)
+//   - phone: string
+//   - relation: string
+//
+// Collection: users/{userId}/vault
+// Document ID: {itemId}
+// Fields:
+//   - title: string (required)
+//   - content: string (required)
+//   - category: string
+//   - createdAt: timestamp
+//
+// Collection: users/{userId}/locations
+// Document ID: current
+// Fields:
+//   - latitude: number (required)
+//   - longitude: number (required)
+//   - timestamp: timestamp (required)
+//
+// ===============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'status']) &&
+             data.uid is string &&
+             data.email is string &&
+             data.status in ['active', 'pending_alert', 'alert_triggered'] &&
+             data.keys().hasOnly(['uid', 'email', 'displayName', 'lastCheckIn', 'checkInFrequency', 'status', 'alertTriggeredAt', 'language', 'consentPreferences']);
+    }
+
+    function isValidContact(data) {
+      return data.keys().hasAll(['name', 'email']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             data.keys().hasOnly(['name', 'email', 'phone', 'relation']);
+    }
+
+    function isValidVaultItem(data) {
+      return data.keys().hasAll(['title', 'content']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.content is string && data.content.size() > 0 && data.content.size() < 10000 &&
+             data.keys().hasOnly(['title', 'content', 'category', 'createdAt']);
+    }
+
+    function isValidLocation(data) {
+      return data.keys().hasAll(['latitude', 'longitude', 'timestamp']) &&
+             data.latitude is number &&
+             data.longitude is number &&
+             data.timestamp is timestamp &&
+             data.keys().hasOnly(['latitude', 'longitude', 'timestamp']);
+    }
+
+    function isValidStatusHistoryItem(data) {
+      return data.keys().hasAll(['toStatus', 'timestamp']) &&
+             data.toStatus is string &&
+             data.timestamp is timestamp &&
+             data.keys().hasOnly(['fromStatus', 'toStatus', 'reason', 'timestamp', 'note']);
+    }
+
+    function isAlertTriggered(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.status == 'alert_triggered';
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if isOwner(userId);
+
+      match /contacts/{contactId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId) && (request.method == 'delete' || isValidContact(request.resource.data));
+      }
+
+      match /vault/{itemId} {
+        // Vault is readable by owner, or by authenticated users if alert is triggered
+        // Note: In a production app, we'd restrict this to specific emergency contact UIDs
+        allow read: if isOwner(userId) || (isAuthenticated() && isAlertTriggered(userId));
+        allow write: if isOwner(userId) && (request.method == 'delete' || isValidVaultItem(request.resource.data));
+      }
+
+      match /locations/{locId} {
+        // Location is readable by owner, or by authenticated users if alert is triggered
+        allow read: if isOwner(userId) || (isAuthenticated() && isAlertTriggered(userId));
+        allow write: if isOwner(userId) && isValidLocation(request.resource.data);
+      }
+
+      match /statusHistory/{historyId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId) && (request.method == 'delete' || isValidStatusHistoryItem(request.resource.data));
+      }
+    }
+  }
+}

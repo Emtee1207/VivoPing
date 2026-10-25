@@ -1,0 +1,5 @@
+{
+  "name": "LifeGuard: Dead Man's Switch",
+  "description": "A safety app that monitors your well-being. It sends weekly check-ins and notifies emergency contacts with your location if you don't respond within 24 hours. Securely store digital legacy data for your loved ones.",
+  "requestFramePermissions": ["geolocation"]
+}

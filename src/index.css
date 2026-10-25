@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-montserrat: 'Montserrat', sans-serif;
+
+    /* VivoPing Brand Palette */
+    --color-primary-signal: #E63946;
+    --color-deep-shadow: #9A031E;
+    --color-tech-silver: #8D99AE;
+    --color-dark-anthracite: #2B2D42;
+    --color-pure-white: #FFFFFF;
+  }
+
+  body {
+    font-family: var(--font-inter);
+    color: var(--color-dark-anthracite);
+    background-color: #FAFAFC;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  h1, h2, h3, h4, .font-heading {
+    font-family: var(--font-montserrat);
+  }
+}
+
+/* Dark mode theme styling */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #0E1017;
+  color: #F1F5F9;
+}
+
+/* Dark mode automatic container & card transformations */
+.dark .bg-white {
+  background-color: #171926 !important;
+}
+
+.dark .bg-slate-50 {
+  background-color: #1F2233 !important;
+}
+
+.dark .bg-slate-100 {
+  background-color: #262A3E !important;
+}
+
+.dark .hover\:bg-slate-50:hover {
+  background-color: #222638 !important;
+}
+
+.dark .hover\:bg-slate-100:hover {
+  background-color: #2C3048 !important;
+}
+
+.dark .border-slate-100,
+.dark .border-slate-200 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .border-slate-300 {
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+.dark .text-slate-900,
+.dark .text-[#2B2D42] {
+  color: #F8FAFC !important;
+}
+
+.dark .text-slate-800 {
+  color: #E2E8F0 !important;
+}
+
+.dark .text-slate-700 {
+  color: #CBD5E1 !important;
+}
+
+.dark .text-slate-600 {
+  color: #94A3B8 !important;
+}
+
+.dark .text-slate-500 {
+  color: #94A3B8 !important;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea,
+.dark select {
+  background-color: #12131D !important;
+  color: #F1F5F9 !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748B !important;
+}
+
+/* Custom utility classes for VivoPing styles */
+.font-montserrat-semibold {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+}
+
+.font-montserrat-regular {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+}
+
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+/* VivoPing Primary Button Styles */
+.btn-vivoping-primary {
+  background-color: #E63946;
+  color: #FFFFFF;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-vivoping-primary:hover {
+  background-color: #d62839;
+  box-shadow: 0 4px 14px rgba(230, 57, 70, 0.35);
+}
+
+.btn-vivoping-primary:active {
+  background-color: #9A031E;
+  transform: scale(0.98);
+}
+
