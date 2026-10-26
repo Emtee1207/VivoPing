@@ -2,44 +2,57 @@
   "entities": {
     "User": {
       "title": "User",
-      "description": "User profile and check-in status",
+      "description": "User profile, appearance preferences, alert template configuration, and check-in status",
       "type": "object",
       "properties": {
-        "uid": { "type": "string" },
-        "email": { "type": "string" },
-        "displayName": { "type": "string" },
+        "uid": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "maxLength": 254 },
+        "displayName": { "type": "string", "maxLength": 120 },
         "lastCheckIn": { "type": "string", "format": "date-time" },
         "checkInFrequency": { "type": "string", "enum": ["weekly"] },
         "status": { "type": "string", "enum": ["active", "pending_alert", "alert_triggered"] },
         "alertTriggeredAt": { "type": "string", "format": "date-time" },
-        "language": { "type": "string" },
-        "consentPreferences": { "type": "string" }
+        "language": { "type": "string", "enum": ["de", "en", "fr", "es", "ru"] },
+        "theme": { "type": "string", "enum": ["light", "dark", "system"] },
+        "consentPreferences": { "type": "string", "maxLength": 2000 },
+        "alertMessageTemplate": { "type": "string", "maxLength": 64 },
+        "alertMessageLanguage": { "type": "string", "enum": ["de", "en", "fr", "es", "ru"] },
+        "alertConfigUpdatedAt": { "type": "number" }
       },
       "required": ["uid", "email", "status"]
     },
     "EmergencyContact": {
       "title": "Emergency Contact",
-      "description": "Contact information for emergency notifications",
+      "description": "Contact information and escalation priority for emergency notifications",
       "type": "object",
       "properties": {
-        "name": { "type": "string" },
-        "email": { "type": "string" },
-        "phone": { "type": "string" },
-        "relation": { "type": "string" }
+        "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 254, "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$" },
+        "phone": { "type": "string", "maxLength": 50 },
+        "relation": { "type": "string", "maxLength": 100 },
+        "priority": { "type": "number", "enum": [1, 2, 3] },
+        "verified": { "type": "boolean" },
+        "dsgvoConfirmedAt": { "type": "number" },
+        "createdAt": { "type": "number" },
+        "verifiedAt": { "type": "number" }
       },
       "required": ["name", "email"]
     },
     "VaultItem": {
       "title": "Vault Item",
-      "description": "Securely stored credentials or information",
+      "description": "Securely stored credentials or encrypted legacy information",
       "type": "object",
       "properties": {
-        "title": { "type": "string" },
-        "content": { "type": "string" },
-        "category": { "type": "string" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "content": { "type": "string", "maxLength": 10000 },
+        "category": { "type": "string", "maxLength": 100 },
+        "ciphertext": { "type": "string", "maxLength": 20000 },
+        "iv": { "type": "string", "maxLength": 128 },
+        "salt": { "type": "string", "maxLength": 128 },
+        "isEncrypted": { "type": "boolean" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["title", "content"]
+      "required": ["title"]
     },
     "Location": {
       "title": "Location",
@@ -57,11 +70,11 @@
       "description": "Timestamped log of status changes for auditing and alerts tracking",
       "type": "object",
       "properties": {
-        "fromStatus": { "type": "string" },
-        "toStatus": { "type": "string" },
-        "reason": { "type": "string" },
+        "fromStatus": { "type": "string", "maxLength": 50 },
+        "toStatus": { "type": "string", "maxLength": 50 },
+        "reason": { "type": "string", "maxLength": 100 },
         "timestamp": { "type": "string", "format": "date-time" },
-        "note": { "type": "string" }
+        "note": { "type": "string", "maxLength": 500 }
       },
       "required": ["toStatus", "timestamp"]
     }
@@ -69,7 +82,7 @@
   "firestore": {
     "/users/{userId}": {
       "schema": "User",
-      "description": "User profile and status"
+      "description": "User profile, appearance theme, alert config, and status"
     },
     "/users/{userId}/contacts/{contactId}": {
       "schema": "EmergencyContact",
@@ -79,7 +92,7 @@
       "schema": "VaultItem",
       "description": "Secure information for emergency access"
     },
-    "/users/{userId}/locations/current": {
+    "/users/{userId}/locations/{locId}": {
       "schema": "Location",
       "description": "Current location of the user"
     },

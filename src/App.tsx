@@ -169,8 +169,8 @@ export default function App() {
             // Create initial user data
             const initialData = {
               uid: currentUser.uid,
-              email: currentUser.email,
-              displayName: currentUser.displayName,
+              email: currentUser.email || '',
+              displayName: currentUser.displayName || '',
               status: 'active',
               lastCheckIn: serverTimestamp(),
               checkInFrequency: 'weekly',

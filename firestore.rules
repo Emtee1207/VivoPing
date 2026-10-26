@@ -1,94 +1,128 @@
-// ===============================================================
-// Assumed Data Model
-// ===============================================================
-//
-// Collection: users
-// Document ID: {userId}
-// Fields:
-//   - uid: string (required)
-//   - email: string (required)
-//   - displayName: string
-//   - lastCheckIn: timestamp
-//   - checkInFrequency: string (enum: ['weekly'])
-//   - status: string (enum: ['active', 'pending_alert', 'alert_triggered'])
-//   - alertTriggeredAt: timestamp
-//
-// Collection: users/{userId}/contacts
-// Document ID: {contactId}
-// Fields:
-//   - name: string (required)
-//   - email: string (required)
-//   - phone: string
-//   - relation: string
-//
-// Collection: users/{userId}/vault
-// Document ID: {itemId}
-// Fields:
-//   - title: string (required)
-//   - content: string (required)
-//   - category: string
-//   - createdAt: timestamp
-//
-// Collection: users/{userId}/locations
-// Document ID: current
-// Fields:
-//   - latitude: number (required)
-//   - longitude: number (required)
-//   - timestamp: timestamp (required)
-//
-// ===============================================================
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Default-deny catch-all safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
     // ===============================================================
     // Helper Functions
     // ===============================================================
-    
-    function isAuthenticated() {
+
+    function isSignedIn() {
       return request.auth != null;
     }
 
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
-    function isValidUser(data) {
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidUser(data, userId) {
       return data.keys().hasAll(['uid', 'email', 'status']) &&
-             data.uid is string &&
-             data.email is string &&
+             data.keys().hasOnly([
+               'uid',
+               'email',
+               'displayName',
+               'lastCheckIn',
+               'checkInFrequency',
+               'status',
+               'alertTriggeredAt',
+               'language',
+               'theme',
+               'consentPreferences',
+               'alertMessageTemplate',
+               'alertMessageLanguage',
+               'alertConfigUpdatedAt'
+             ]) &&
+             data.uid is string && data.uid == userId && data.uid.size() <= 128 &&
+             data.email is string && data.email.size() <= 254 &&
              data.status in ['active', 'pending_alert', 'alert_triggered'] &&
-             data.keys().hasOnly(['uid', 'email', 'displayName', 'lastCheckIn', 'checkInFrequency', 'status', 'alertTriggeredAt', 'language', 'consentPreferences']);
+             (!('displayName' in data) || data.displayName == null || (data.displayName is string && data.displayName.size() <= 120)) &&
+             (!('checkInFrequency' in data) || (data.checkInFrequency is string && data.checkInFrequency.size() <= 32)) &&
+             (!('language' in data) || (data.language is string && data.language in ['de', 'en', 'fr', 'es', 'ru'])) &&
+             (!('theme' in data) || (data.theme is string && data.theme in ['light', 'dark', 'system'])) &&
+             (!('consentPreferences' in data) || (data.consentPreferences is string && data.consentPreferences.size() <= 2000)) &&
+             (!('alertMessageTemplate' in data) || (data.alertMessageTemplate is string && data.alertMessageTemplate.size() <= 64)) &&
+             (!('alertMessageLanguage' in data) || (data.alertMessageLanguage is string && data.alertMessageLanguage in ['de', 'en', 'fr', 'es', 'ru'])) &&
+             (!('alertConfigUpdatedAt' in data) || data.alertConfigUpdatedAt is number);
     }
 
     function isValidContact(data) {
       return data.keys().hasAll(['name', 'email']) &&
-             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
-             data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
-             data.keys().hasOnly(['name', 'email', 'phone', 'relation']);
+             data.keys().hasOnly([
+               'name',
+               'email',
+               'phone',
+               'relation',
+               'priority',
+               'verified',
+               'dsgvoConfirmedAt',
+               'createdAt',
+               'verifiedAt'
+             ]) &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+             data.email is string && data.email.size() <= 254 &&
+             data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() <= 50)) &&
+             (!('relation' in data) || (data.relation is string && data.relation.size() <= 100)) &&
+             (!('priority' in data) || (data.priority is number && data.priority in [1, 2, 3])) &&
+             (!('verified' in data) || data.verified is bool) &&
+             (!('dsgvoConfirmedAt' in data) || data.dsgvoConfirmedAt is number) &&
+             (!('createdAt' in data) || data.createdAt is number) &&
+             (!('verifiedAt' in data) || data.verifiedAt is number);
     }
 
     function isValidVaultItem(data) {
-      return data.keys().hasAll(['title', 'content']) &&
-             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
-             data.content is string && data.content.size() > 0 && data.content.size() < 10000 &&
-             data.keys().hasOnly(['title', 'content', 'category', 'createdAt']);
+      return data.keys().hasAll(['title']) &&
+             data.keys().hasOnly([
+               'title',
+               'content',
+               'category',
+               'ciphertext',
+               'iv',
+               'salt',
+               'isEncrypted',
+               'createdAt'
+             ]) &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+             (!('content' in data) || (data.content is string && data.content.size() <= 10000)) &&
+             (!('category' in data) || (data.category is string && data.category.size() <= 100)) &&
+             (!('ciphertext' in data) || (data.ciphertext is string && data.ciphertext.size() <= 20000)) &&
+             (!('iv' in data) || (data.iv is string && data.iv.size() <= 128)) &&
+             (!('salt' in data) || (data.salt is string && data.salt.size() <= 128)) &&
+             (!('isEncrypted' in data) || data.isEncrypted is bool);
     }
 
     function isValidLocation(data) {
       return data.keys().hasAll(['latitude', 'longitude', 'timestamp']) &&
+             data.keys().hasOnly(['latitude', 'longitude', 'timestamp']) &&
              data.latitude is number &&
              data.longitude is number &&
-             data.timestamp is timestamp &&
-             data.keys().hasOnly(['latitude', 'longitude', 'timestamp']);
+             data.timestamp is timestamp;
     }
 
     function isValidStatusHistoryItem(data) {
       return data.keys().hasAll(['toStatus', 'timestamp']) &&
-             data.toStatus is string &&
+             data.keys().hasOnly(['fromStatus', 'toStatus', 'reason', 'timestamp', 'note']) &&
+             data.toStatus is string && data.toStatus.size() <= 50 &&
              data.timestamp is timestamp &&
-             data.keys().hasOnly(['fromStatus', 'toStatus', 'reason', 'timestamp', 'note']);
+             (!('fromStatus' in data) || (data.fromStatus is string && data.fromStatus.size() <= 50)) &&
+             (!('reason' in data) || (data.reason is string && data.reason.size() <= 100)) &&
+             (!('note' in data) || (data.note is string && data.note.size() <= 500));
     }
 
     function isAlertTriggered(userId) {
@@ -100,32 +134,41 @@ service cloud.firestore {
     // ===============================================================
 
     match /users/{userId} {
-      allow read: if isOwner(userId);
-      allow create: if isOwner(userId) && isValidUser(request.resource.data);
-      allow update: if isOwner(userId) && isValidUser(request.resource.data);
-      allow delete: if isOwner(userId);
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUser(incoming(), userId);
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUser(incoming(), userId) && incoming().uid == existing().uid;
+      allow delete: if isOwner(userId) && isValidId(userId);
 
       match /contacts/{contactId} {
-        allow read: if isOwner(userId);
-        allow write: if isOwner(userId) && (request.method == 'delete' || isValidContact(request.resource.data));
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(contactId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(contactId) && isValidContact(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(contactId) && isValidContact(incoming());
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(contactId);
       }
 
       match /vault/{itemId} {
-        // Vault is readable by owner, or by authenticated users if alert is triggered
-        // Note: In a production app, we'd restrict this to specific emergency contact UIDs
-        allow read: if isOwner(userId) || (isAuthenticated() && isAlertTriggered(userId));
-        allow write: if isOwner(userId) && (request.method == 'delete' || isValidVaultItem(request.resource.data));
+        allow get: if (isOwner(userId) && isValidId(userId) && isValidId(itemId)) || (isSignedIn() && isValidId(userId) && isValidId(itemId) && isAlertTriggered(userId));
+        allow list: if isOwner(userId) || (isSignedIn() && isAlertTriggered(userId));
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(itemId) && isValidVaultItem(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(itemId) && isValidVaultItem(incoming());
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(itemId);
       }
 
       match /locations/{locId} {
-        // Location is readable by owner, or by authenticated users if alert is triggered
-        allow read: if isOwner(userId) || (isAuthenticated() && isAlertTriggered(userId));
-        allow write: if isOwner(userId) && isValidLocation(request.resource.data);
+        allow get: if (isOwner(userId) && isValidId(userId) && isValidId(locId)) || (isSignedIn() && isValidId(userId) && isValidId(locId) && isAlertTriggered(userId));
+        allow list: if isOwner(userId) || (isSignedIn() && isAlertTriggered(userId));
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(locId) && isValidLocation(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(locId) && isValidLocation(incoming());
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(locId);
       }
 
       match /statusHistory/{historyId} {
-        allow read: if isOwner(userId);
-        allow write: if isOwner(userId) && (request.method == 'delete' || isValidStatusHistoryItem(request.resource.data));
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(historyId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(historyId) && isValidStatusHistoryItem(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(historyId) && isValidStatusHistoryItem(incoming());
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(historyId);
       }
     }
   }
