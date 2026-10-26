@@ -548,7 +548,7 @@ export default function App() {
             onClick={() => handleOpenLegal('appstore')}
             className="hover:text-[#E63946] transition-colors cursor-pointer"
           >
-            Stores
+            Play Store & PWA
           </button>
           <span>•</span>
           <button 

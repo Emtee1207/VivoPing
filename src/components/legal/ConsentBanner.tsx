@@ -108,7 +108,7 @@ export default function ConsentBanner({ lang, onConsentSaved, forceOpen, onClose
                   {t.consentBannerTitle}
                 </h3>
                 <span className="text-[11px] text-slate-500 font-medium">
-                  DSGVO / GDPR, ePrivacy & App-Store konform
+                  DSGVO / GDPR & ePrivacy konform
                 </span>
               </div>
             </div>

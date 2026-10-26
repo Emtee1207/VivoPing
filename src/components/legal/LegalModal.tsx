@@ -104,7 +104,7 @@ export default function LegalModal({ isOpen, onClose, initialTab = 'impressum', 
               active={activeTab === 'appstore'} 
               onClick={() => setActiveTab('appstore')}
               icon={<Smartphone className="w-3.5 h-3.5" />}
-              label="App-Store Richtlinien"
+              label="Play Store & PWA"
             />
             <TabBtn 
               active={activeTab === 'accessibility'} 
@@ -140,7 +140,7 @@ export default function LegalModal({ isOpen, onClose, initialTab = 'impressum', 
                     Impressum & Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG)
                   </h3>
                   <p className="text-xs text-slate-400">
-                    Gültig für die Web-Applikation sowie mobile Applikationen (iOS / Android) von VivoPing
+                    Gültig für die Web-Applikation (PWA) sowie mobile Android-Applikationen von VivoPing
                   </p>
                 </div>
 
@@ -177,7 +177,7 @@ export default function LegalModal({ isOpen, onClose, initialTab = 'impressum', 
                     Datenschutzerklärung (Privacy Policy)
                   </h3>
                   <p className="text-xs text-slate-400">
-                    Standardgemäß konform mit DSGVO (GDPR), CCPA, Apple App Store Privacy Guidelines und Google Play Data Safety
+                    Standardgemäß konform mit DSGVO (GDPR), CCPA und Google Play Data Safety
                   </p>
                 </div>
 
@@ -274,7 +274,7 @@ export default function LegalModal({ isOpen, onClose, initialTab = 'impressum', 
                 <div className="space-y-3">
                   <h4 className="font-bold text-slate-900 text-sm">§ 1 Vertragsgegenstand & Lizenz</h4>
                   <p className="text-xs text-slate-600 leading-relaxed">
-                    Der Anbieter gewährt dem Nutzer eine persönliche, nicht-exklusive, nicht übertragbare Lizenz zur Nutzung der App LifeGuard auf kompatiblen Endgeräten (Web, iOS, Android).
+                    Der Anbieter gewährt dem Nutzer eine persönliche, nicht-exklusive, nicht übertragbare Lizenz zur Nutzung der App VivoPing auf kompatiblen Endgeräten (Web, PWA, Android).
                   </p>
                 </div>
 
@@ -301,31 +301,31 @@ export default function LegalModal({ isOpen, onClose, initialTab = 'impressum', 
               </div>
             )}
 
-            {/* TAB 4: APP STORE GUIDELINES */}
+            {/* TAB 4: GOOGLE PLAY & PWA GUIDELINES */}
             {activeTab === 'appstore' && (
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 mb-1">
-                    App-Store Richtlinien (Apple App Store & Google Play)
+                    Plattform- & Store-Richtlinien (Google Play & Progressive Web App)
                   </h3>
                   <p className="text-xs text-slate-400">
-                    Spezifische Konformitätsnachweiserklärungen für die Store-Zulassung
+                    Spezifische Konformitätsnachweiserklärungen für Web/PWA und Android (Google Play)
                   </p>
                 </div>
 
                 <div className="space-y-4">
-                  {/* Apple Guideline 5.1.1(v) */}
+                  {/* Google Play Account Deletion & GDPR Art. 17 */}
                   <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm text-slate-900">
-                        Apple App Store Guideline 5.1.1(v) – Account Deletion
+                        DSGVO Art. 17 & Google Play Account Deletion Policy
                       </span>
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
                         Konform
                       </span>
                     </div>
                     <p className="text-xs text-slate-600 leading-relaxed">
-                      Apps, die die Erstellung eines Kontos unterstützen, müssen den Nutzern auch ermöglichen, ihr Konto direkt innerhalb der App zu löschen. LifeGuard bietet im Menüpunkt "Gefahrenzone" eine sofortige, vollständige und unwiderrufliche Kontolöschung inklusive aller Server-Datensätze.
+                      Nutzer können ihr Konto und sämtliche zugehörigen Daten jederzeit direkt innerhalb der App löschen. VivoPing bietet im Menüpunkt „Gefahrenzone“ eine sofortige, vollständige und unwiderrufliche Kontolöschung inklusive aller Server-Datensätze.
                     </p>
                   </div>
 
@@ -340,22 +340,22 @@ export default function LegalModal({ isOpen, onClose, initialTab = 'impressum', 
                       </span>
                     </div>
                     <p className="text-xs text-slate-600 leading-relaxed">
-                      Standortdaten werden nur zur Erfüllung der Kernfunktion ("Dead Man's Switch Rettungsort für Notfallkontakte") abgefragt. Vor Aktivierung erfolgt eine prominente In-App-Erklärung ("Prominent Disclosure"). Es erfolgt kein Verkauf an Datenbroker oder Werbenetzwerke.
+                      Standortdaten werden nur zur Erfüllung der Kernfunktion („Dead Man&apos;s Switch Rettungsort für Notfallkontakte“) abgefragt. Vor Aktivierung erfolgt eine prominente In-App-Erklärung („Prominent Disclosure“). Es erfolgt kein Verkauf an Datenbroker oder Werbenetzwerke.
                     </p>
                   </div>
 
-                  {/* App Nutrition Labels */}
+                  {/* Progressive Web App (PWA) Distribution */}
                   <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm text-slate-900">
-                        Apple Privacy Nutrition Labels (Datenverknüpfung)
+                        Progressive Web App (PWA) & Direkt-Installation
                       </span>
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
-                        Deklariert
+                        Aktiv
                       </span>
                     </div>
                     <p className="text-xs text-slate-600 leading-relaxed">
-                      Die erfassten Daten (Standort, Kontaktdaten, Benutzerinhalte) sind an die Identität des Benutzers gekoppelt ("Data Linked to You"), werden aber <strong>nicht zum Tracking</strong> über Apps und Websites Dritter hinweg verwendet.
+                      VivoPing kann direkt über den Webbrowser als eigenständige Progressive Web App (PWA) ohne kostenpflichtigen Drittanbieter-Store auf dem Startbildschirm installiert werden. Eine Veröffentlichung im Apple App Store ist derzeit deaktiviert.
                     </p>
                   </div>
                 </div>

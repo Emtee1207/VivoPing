@@ -236,21 +236,17 @@ export default function SettingsView({
           <p className="text-xs text-indigo-800 leading-relaxed">
             {t.accountsNeededDesc}
           </p>
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-xs text-indigo-950 font-medium">
+          <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 text-xs text-indigo-950 font-medium">
             <li className="flex items-start gap-2 bg-white/80 p-2.5 rounded-xl border border-indigo-100">
               <span className="text-indigo-600 font-bold">1.</span>
               <span><strong>Firebase / Google Cloud:</strong> Für Datenbank, Auth & Hosting</span>
             </li>
             <li className="flex items-start gap-2 bg-white/80 p-2.5 rounded-xl border border-indigo-100">
               <span className="text-indigo-600 font-bold">2.</span>
-              <span><strong>Apple Developer ($99/Jahr):</strong> Für die iOS App Store Veröffentlichung</span>
-            </li>
-            <li className="flex items-start gap-2 bg-white/80 p-2.5 rounded-xl border border-indigo-100">
-              <span className="text-indigo-600 font-bold">3.</span>
               <span><strong>Google Play Console ($25):</strong> Für die Android Play Store Veröffentlichung</span>
             </li>
             <li className="flex items-start gap-2 bg-white/80 p-2.5 rounded-xl border border-indigo-100">
-              <span className="text-indigo-600 font-bold">4.</span>
+              <span className="text-indigo-600 font-bold">3.</span>
               <span><strong>Domain & E-Mail:</strong> Eigene Domain für Impressum & Support (Anti-Spam geschützt)</span>
             </li>
           </ul>
